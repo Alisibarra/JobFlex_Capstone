@@ -1,0 +1,175 @@
+<style>
+  /* Custom scrollbar for the modal body */
+  #modal-body::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  #modal-body::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  #modal-body::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.6); /* gray-400 w/ opacity */
+    border-radius: 9999px; /* fully rounded */
+    transition: background-color 0.2s ease;
+  }
+
+  #modal-body::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(107, 114, 128, 0.8); /* darker gray on hover */
+  }
+
+  /* For Firefox */
+  #modal-body {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.6) transparent;
+  }
+	.ts-wrapper.multi .ts-control > div {
+  cursor: pointer;
+  margin: 0 3px 3px 0;
+  padding: 2px 6px;
+    padding-right: 6px;
+  background: #f2f2f2;
+  color: #303030;
+  border: 0 solid #d0d0d0;
+	}
+</style>
+<style>
+	/* === Tom Select Reset for Tailwind Control === */
+	/* Remove Tom Select's default pill background, padding, borders, etc. */
+	.ts-wrapper.multi .ts-control .remove:hover {
+		opacity: 1;
+	}
+</style>
+<div class="flex flex-col max-h-[90vh]">
+  <!-- Modal Header -->
+  <div id="modal-header" class="flex justify-between items-center pb-3 border-b border-gray-200 flex-shrink-0">
+    <h2 class="text-xl font-semibold">Crear Oferta de Trabajo</h2>
+    <button class="close-modal px-2 py-1 text-gray-500 hover:text-gray-700 focus:outline-none">
+      ✕
+    </button>
+  </div>
+  <!-- Modal Body (scrollable area) -->
+  <div id="modal-body" class="flex-auto overflow-y-auto mt-4 px-2">
+    <div class="grid grid-cols-10 grid-rows-8 gap-5">
+      <div class="col-span-8 row-span-8 col-start-2 flex justify-center">
+        <form method="post" action="{% url 'newjob' %}" id="jobForm" class="space-y-5 w-full">
+          {% csrf_token %}
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+						{% for field in form%}
+							{% if field.name == "requirements_data" %}
+							<div class="md:col-span-2">
+								<div class="mb-2 flex items-center">
+									<label class="block text-sm font-medium text-gray-700 mb-2 mr-3">Requerimientos</label>
+									<button type="button" id="add-requirement" class="bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-1 px-3 rounded-lg transition">
+										+ Agregar requisito
+									</button>
+								</div>
+								<div id="requirements-container" class="space-y-2"></div>
+								<input hidden type="text" name="requirements_data">
+								{{ field }}
+							</div>
+							{% elif field.name == "abilities" %}
+							<div class="md:col-span-2">
+								<label class="block text-sm font-medium text-gray-700 mb-1">{{field.label}}</label>
+								<select id="id_abilities" name="abilities" multiple>
+									{% for h in field.field.queryset %}
+									<option data-color="{{h.color}}"value="{{ h.id }}">{{ h.name }}</option>
+									{% endfor %}
+								</select>
+							</div>
+							{% else %}
+							<div>
+								<label class="block text-sm font-medium text-gray-700 mb-1">{{field.label}}</label>
+								{{field}}
+							</div>
+							{% endif %}
+						{% endfor %}
+          </div>
+
+          
+
+          <button
+            id="send"
+            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition"
+          >
+            Guardar oferta
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- Modal Footer -->
+  <div
+    id="modal-footer"
+    class="flex justify-end pt-4 border-t border-gray-200 flex-shrink-0 mt-2"
+  >
+    <div class="flex justify-between w-full items-center">
+      <div class="text-center flex-1">footer</div>
+      <button class="px-2 py-1 bg-gray-200 rounded-lg close-modal">
+        close
+      </button>
+    </div>
+  </div>
+</div>
+<script>
+$("document").ready(() => {
+  const container = $("#requirements-container");
+  const addBtn = $("#add-requirement");
+  const hiddenField = $('[name="requirements_data"]');
+  const form = $("#jobForm");
+
+  // Add a new requirement field
+  function addRequirement(value = "") {
+    const div = $("<div>");
+    div.addClass("flex gap-2 items-center");
+
+    div.html(`
+      <input type="text" value="${value}" placeholder="Ej: Experiencia con React.js"
+        class="border border-gray-300 rounded-lg p-2 w-full focus:ring-2 focus:ring-blue-400 focus:outline-none" />
+      <button type="button" class="remove text-red-600 hover:text-red-800 font-semibold">✕</button>
+    `);
+
+    $(div).children(".remove").on("click", () => div.remove());
+    container.append(div);
+  }
+
+  addBtn.on("click", () => addRequirement());
+
+  // When submitting, store all requirements as JSON in the hidden field
+  $('#send').on("click", (e) => {
+    const values = Array.from(container.find("input[type='text']"))
+      .map(input => input.value.trim())
+      .filter(v => v);
+    hiddenField.val(JSON.stringify(values));
+		$.ajax({
+			type: $(this).attr('method'),
+			url: $(this).attr('action'),
+			data: $(this).serialize(),
+			success: function (data) {
+					console.log(data);
+			},
+			error: function(data) {
+					console.log(data);
+			}
+		});
+  });
+});
+</script>
+<script>
+new TomSelect('#id_abilities', {
+  plugins: ['remove_button'],
+  create: true,
+  persist: false,
+  render: {
+    item: (data, escape) => 
+      `<div class="!bg-${data.color || 'blue'}-100 !text-${data.color || 'blue'}-800 !rounded-full !px-3 !py-1 !text-sm !mr-1">
+        ${escape(data.text)}
+      </div>`,
+    option: (data, escape) =>
+      `<div class="!py-2 !px-3 hover:!bg-${data.color || 'blue'}-100 !rounded-lg">
+        ${escape(data.text)}
+      </div>`
+  }
+});
+</script>

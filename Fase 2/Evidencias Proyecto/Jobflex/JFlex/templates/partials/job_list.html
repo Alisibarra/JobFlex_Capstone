@@ -1,0 +1,55 @@
+<style>
+	div.paginator>a:disabled {
+		cursor: default;
+	}
+	.non-select{
+		user-select: none;
+		-ms-user-select: none;
+		-moz-user-select: none;
+		-webkit-user-select: none;
+	}
+</style>
+<ul>
+  {% for job in page_obj %}
+		<div class="job-card active-card cursor-pointer p-4 border-b border-l-4 border-l-primary bg-gray-50"
+			data-job-id="{{ job.id }}">
+			<div class="non-select flex items-center"><img src="https://picsum.photos/seed/1/48/48"
+					class="w-12 h-12 rounded-md mr-4">
+				<div class="flex-grow">
+					<h3 class="non-select font-bold text-primary">{{ job.name }}</h3>
+					<p class="non-select text-sm text-dark font-semibold">{{ job.company }}</p>
+					<p class="non-select text-sm text-secondary">{{job.get_mode_display }}</p>
+				</div>
+			</div>
+			<div class="flex flex-wrap gap-2">
+				{% for ab in job.abilities.all %}
+				<span class="non-select bg-{{ab.color}}-100 text-{{ab.color}}-800 text-xs font-medium px-2.5 py-0.5 rounded-full">{{ab.name}}</span>
+				{% empty %}
+				Sin Abilidades Especificas
+				{% endfor %}
+			</div>
+		</div>
+  {% empty %}
+    <li>No jobs found.</li>
+  {% endfor %}
+</ul>
+<div class="flex justify-center items-center mt-2 pr-2">
+	<div class="pagination">
+		{% comment %}?search={{ search }}{% endcomment %}
+		{% if page_obj.has_previous %}
+			<a class="rounded-lg bg-gray-200 px-2 py-1 text-gray-500 hover:text-gray-700 focus:outline-none non-select" href="?page=1">&laquo; first</a>
+			<a class="rounded-lg bg-gray-200 px-2 py-1 text-gray-500 hover:text-gray-700 focus:outline-none non-select" href="?page={{ page_obj.previous_page_number }}">previous</a>
+		{% else %}
+			<button disabled class="rounded-lg bg-gray-200 px-2 py-1 text-gray-500 focus:outline-none non-select">&laquo;</button>
+		{% endif %}
+	
+		<span class="non-select">{{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span>
+	
+		{% if page_obj.has_next %}
+			<a class="rounded-lg bg-gray-200 px-2 py-1 text-gray-500 hover:text-gray-700 focus:outline-none non-select" href="?page={{ page_obj.next_page_number }}">next</a>
+			<a class="rounded-lg bg-gray-200 px-2 py-1 text-gray-500 hover:text-gray-700 focus:outline-none non-select" href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+		{% else %}
+			<button disabled class="rounded-lg bg-gray-200 px-2 py-1 text-gray-500 focus:outline-none non-select">&raquo;</button>
+		{% endif %}
+	</div>
+</div>

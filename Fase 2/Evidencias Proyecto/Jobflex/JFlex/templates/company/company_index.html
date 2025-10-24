@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Panel de Empresa{% endblock %}
+
+{% block content %}
+<script src="{% url 'js_reverse' %}"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<div class="flex h-screen bg-gray-100 font-sans">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-md hidden sm:block">
+        <div class="p-6">
+            <h2 class="text-xl font-bold text-dark">{{ company.name|default:"Mi Empresa" }}</h2>
+            <p class="text-sm text-secondary">Panel de Control</p>
+        </div>
+        <nav class="mt-2">
+            <div class="px-6 py-4">
+								<button href="#" data-modal-target="newjob" class="w-full block bg-primary text-white font-bold py-2 px-4 rounded-lg hover:bg-opacity-90 text-center mb-3">
+                    Crear Empleo
+								</button>
+                {% if is_admin %}
+                <button data-modal-toggle="invitation-modal" class="w-full block bg-secondary text-white font-bold py-2 px-4 rounded-lg hover:bg-opacity-90 text-center">
+                    Crear Usuario
+                </button>
+                {% endif %}
+            </div>
+            
+            <a class="tab-link active-tab flex items-center px-6 py-3 text-dark hover:bg-gray-200" href="#" data-tab="dashboard">
+                <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                <span>Dashboard</span>
+            </a>
+            
+            <div id="jobs-menu">
+                <a class="tab-link flex items-center justify-between px-6 py-3 text-dark hover:bg-gray-200 cursor-pointer" onclick="toggleSubmenu()">
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        <span>Empleos</span>
+                    </div>
+                    <svg id="submenu-arrow" class="w-4 h-4 transition-transform transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </a>
+                <div id="jobs-submenu" class="hidden pl-12 bg-gray-50">
+                    <a class="tab-link block py-2 text-secondary hover:text-dark" href="#" data-tab="all-jobs">Todos los empleos</a>
+                    <a class="tab-link block py-2 text-secondary hover:text-dark" href="#" data-tab="tags">Tags</a>
+                </div>
+            </div>
+
+            {% if is_admin %}
+            <a class="tab-link flex items-center px-6 py-3 text-dark hover:bg-gray-200" href="#" data-tab="users">
+                <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2"></path></svg>
+                <span>Usuarios</span>
+            </a>
+            {% endif %}
+
+            <a class="tab-link flex items-center px-6 py-3 text-dark hover:bg-gray-200" href="#" data-tab="candidates">
+                <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                <span>Candidatos</span>
+            </a>
+            <a class="tab-link flex items-center px-6 py-3 text-dark hover:bg-gray-200" href="#" data-tab="interviews">
+                <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                <span>Entrevistas</span>
+            </a>
+            <a class="tab-link flex items-center px-6 py-3 text-dark hover:bg-gray-200" href="#" data-tab="analytics">
+                <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
+                <span>Análisis</span>
+            </a>
+            <a class="tab-link flex items-center px-6 py-3 text-dark hover:bg-gray-200" href="#" data-tab="tools">
+                <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <span>Herramientas</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="flex-1 p-6 sm:p-10 overflow-y-auto">
+        <!-- Dashboard Content -->
+        <div id="dashboard" class="tab-content">
+            <h1 class="text-3xl font-bold text-dark mb-6">Dashboard</h1>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-primary">Empleos Activos</h3>
+                    <p class="text-3xl font-bold text-dark mt-2">5</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-primary">Nuevos Candidatos</h3>
+                    <p class="text-3xl font-bold text-dark mt-2">12</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-primary">Entrevistas Hoy</h3>
+                    <p class="text-3xl font-bold text-dark mt-2">3</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-primary">Vistas del Perfil</h3>
+                    <p class="text-3xl font-bold text-dark mt-2">1,204</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- All Jobs Content -->
+        <div id="all-jobs" class="tab-content hidden">
+            <h1 class="text-3xl font-bold text-dark mb-6">Todos los Empleos</h1>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b">
+                            <th class="py-2">Título del Puesto</th>
+                            <th class="py-2">Estado</th>
+                            <th class="py-2">Candidatos</th>
+                            <th class="py-2">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b">
+                            <td class="py-4">Desarrollador Full-Stack</td>
+                            <td class="py-4"><span class="bg-green-200 text-green-800 py-1 px-3 rounded-full text-xs">Activo</span></td>
+                            <td class="py-4">25</td>
+                            <td class="py-4"><a href="#" class="text-primary hover:underline">Ver</a></td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-4">Diseñador UX/UI</td>
+                            <td class="py-4"><span class="bg-yellow-200 text-yellow-800 py-1 px-3 rounded-full text-xs">En Pausa</span></td>
+                            <td class="py-4">10</td>
+                            <td class="py-4"><a href="#" class="text-primary hover:underline">Ver</a></td>
+                        </tr>
+                        <tr>
+                            <td class="py-4">Analista de Datos</td>
+                            <td class="py-4"><span class="bg-red-200 text-red-800 py-1 px-3 rounded-full text-xs">Cerrado</span></td>
+                            <td class="py-4">58</td>
+                            <td class="py-4"><a href="#" class="text-primary hover:underline">Ver</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Users Content -->
+        {% if is_admin %}
+        <div id="users" class="tab-content hidden">
+            <h1 class="text-3xl font-bold text-dark mb-6">Usuarios de la Empresa</h1>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b">
+                            <th class="py-2">Nombre</th>
+                            <th class="py-2">Email</th>
+                            <th class="py-2">Rol</th>
+                            <th class="py-2">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for member in members %}
+                        <tr class="border-b">
+                            <td class="py-4">{{ member.user.get_full_name }}</td>
+                            <td class="py-4">{{ member.user.email }}</td>
+                            <td class="py-4">{{ member.get_role_display }}</td>
+                            <td class="py-4">
+                                <button data-modal-toggle="edit-modal-{{ member.pk }}" class="text-primary hover:underline">Editar</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Other Tab Content (Placeholders) -->
+        <div id="tags" class="tab-content hidden"><h1 class="text-3xl font-bold">Gestión de Tags (Próximamente)</h1></div>
+        <div id="candidates" class="tab-content hidden"><h1 class="text-3xl font-bold">Gestión de Candidatos (Próximamente)</h1></div>
+        <div id="interviews" class="tab-content hidden"><h1 class="text-3xl font-bold">Gestión de Entrevistas (Próximamente)</h1></div>
+        <div id="analytics" class="tab-content hidden"><h1 class="text-3xl font-bold">Análisis de Datos (Próximamente)</h1></div>
+        <div id="tools" class="tab-content hidden"><h1 class="text-3xl font-bold">Herramientas Adicionales (Próximamente)</h1></div>
+    </main>
+</div>
+
+<!-- Invitation Modal (Shared) -->
+{% if is_admin %}
+<div id="invitation-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3 text-center">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Invitar Nuevo Usuario</h3>
+            <div class="mt-2 px-7 py-3">
+                <form method="POST" action="{% url 'company_index' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="invite_user">
+                    {{ invitation_form.as_p }}
+                    <div class="items-center px-4 py-3">
+                        <button data-modal-hide="invitation-modal" type="button" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-auto shadow-sm hover:bg-gray-700">Cancelar</button>
+                        <button type="submit" class="px-4 py-2 bg-primary text-white text-base font-medium rounded-md w-auto shadow-sm hover:bg-opacity-90">Enviar Invitación</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Individual Edit Modals (Generated in loop) -->
+{% for member in members %}
+<div id="edit-modal-{{ member.pk }}" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3 text-center">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Editar Usuario: <span class="font-bold">{{ member.user.get_full_name }}</span></h3>
+            <div class="mt-2 px-7 py-3 text-left">
+                <form method="POST" action="{% url 'company_index' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="edit_user">
+                    <input type="hidden" name="member_id" value="{{ member.pk }}">
+                    
+                    <div class="mb-4">
+                        <label for="email-{{ member.pk }}" class="block text-sm font-medium text-dark">Email</label>
+                        <input type="email" name="email" id="email-{{ member.pk }}" class="mt-1 block w-full p-3 border border-light-gray rounded-lg" value="{{ member.user.email }}">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="role-{{ member.pk }}" class="block text-sm font-medium text-dark">Rol</label>
+                        <select name="role" id="role-{{ member.pk }}" class="mt-1 block w-full p-3 border border-light-gray rounded-lg">
+                            {% for value, label in invitation_form.fields.role.choices %}
+                                <option value="{{ value }}" {% if value == member.role %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="items-center px-4 py-3 bg-gray-50 -mx-7 -mb-5 mt-6 rounded-b-md">
+                        <button data-modal-hide="edit-modal-{{ member.pk }}" type="button" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-auto shadow-sm hover:bg-gray-700">Cancelar</button>
+                        <button type="submit" class="px-4 py-2 bg-primary text-white text-base font-medium rounded-md w-auto shadow-sm hover:bg-opacity-90">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="mt-4 border-t pt-4 text-center">
+            <form method="POST" action="{% url 'company_index' %}" onsubmit="return confirm('¿Estás seguro de que quieres eliminar a este usuario? Esta acción no se puede deshacer.');">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete_user">
+                <input type="hidden" name="member_id" value="{{ member.pk }}">
+                <button type="submit" class="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md shadow-sm hover:bg-red-700">Eliminar Usuario</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+<style>
+    .active-tab {
+        background-color: #e5e7eb; /* bg-gray-200 */
+        border-left: 4px solid #8CA01A; /* border-primary */
+        color: #111827; /* text-gray-900 */
+    }
+</style>
+
+<script type="text/javascript" src="{% static 'JS/funcionesCommon.js' %}"></script>
+<script>
+	$('document').ready(function () {
+		
+		// Open modal
+		$("[data-modal-target]").on("click", function (e) {
+			e.preventDefault();
+			var modal = $(this).data("modal-target");
+			loadModal(modal, []);
+		});
+
+		const tabLinks = $('.tab-link');
+		const tabContents = $('.tab-content');
+
+		$('[data-modal-toggle]').on('click',function (e) {
+			e.preventDefault();
+			const toggleAttr = $(this).data('modalToggle');
+			const modal = $('#'+toggleAttr);
+			modal.removeClass('hidden');
+		});
+		$('[data-modal-hide]').on('click',function (e) {
+			e.preventDefault();
+			const hideAttr = $(this).data('modalHide');
+			const modal = $('#'+hideAttr);
+			modal.addClass('hidden');
+		});
+		
+    function switchTab(tabId) {
+        if (!tabId) return;
+				tabLinks.each(function (idx,item) {
+					if ($(item).data('tab')){
+						$(item).toggleClass('active-tab', $(item).data('tab') === tabId)
+					};
+        });
+				tabContents.each(function (idx,cont) {
+					$(cont).toggleClass('hidden', $(cont).attr('id') !== tabId)
+        });
+		};
+		
+		tabLinks.each((i,el) =>{
+			$(el).on('click',e=>{
+            e.preventDefault();
+				const tabId=$(el).data('tab');
+            if (tabId) switchTab(tabId);
+        });
+    });
+    switchTab('dashboard'); // Set dashboard as default
+
+    // --- Submenu Toggle ---
+    window.toggleSubmenu = function () {
+				$('#jobs-submenu').toggleClass('hidden');
+				$('#submenu-arrow').toggleClass('rotate-180');
+    }
+});
+</script>
+{% endblock %}

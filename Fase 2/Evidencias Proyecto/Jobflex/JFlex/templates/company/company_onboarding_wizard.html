@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onboarding de Empresa - JobFlex</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static '/CSS/style.css'%}">
+    <style>
+        /* Estilos para el fondo difuminado */
+        .blurred-background {
+            filter: blur(8px);
+            -webkit-filter: blur(8px);
+            transition: filter 0.3s ease-in-out;
+        }
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        /* Estilos para los campos de archivo */
+        input[type="file"] {
+            @apply block w-full text-sm text-dark
+                   file:mr-4 file:py-2 file:px-4
+                   file:rounded-lg file:border-0
+                   file:text-sm file:font-semibold
+                   file:bg-primary file:text-white
+                   hover:file:bg-primary/90;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#8CA01A',
+                        'secondary': '#89746F',
+                        'light-gray': '#D8D9DD',
+                        'dark': '#312F32',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-light-gray font-sans flex items-center justify-center min-h-screen">
+
+    <!-- Contenido de fondo (simulado o real) -->
+    <div class="fixed inset-0 bg-cover bg-center blurred-background" style="background-image: url('https://picsum.photos/seed/background/1920/1080');"></div>
+
+    <!-- Modal Overlay -->
+    <div class="fixed inset-0 modal-overlay flex items-center justify-center z-50">
+        <!-- Modal Content -->
+        <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-2xl mx-4 relative z-10">
+            <h2 class="text-3xl font-bold text-dark mb-4 text-center">Completa el Perfil de tu Empresa</h2>
+            <p class="text-secondary mb-6 text-center">Paso {{ current_step_index|add:1 }} de {{ total_steps }}</p>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="bg-{{ message.tags }}-100 border border-{{ message.tags }}-400 text-{{ message.tags }}-700 px-4 py-3 rounded-lg relative mb-6" role="alert">
+                        <span class="block sm:inline">{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div class="relative group">
+                        <label for="{{ field.id_for_label }}" class="input-label absolute top-3 left-3 text-sm font-medium text-dark transition-all duration-200 ease-in-out">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <p class="text-xs text-gray-500 mt-1">{{ field.help_text }}</p>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+                <div class="flex justify-between mt-8">
+                    {% if prev_step_name %}
+                        <a href="?step={{ prev_step_name }}" class="py-2 px-4 border border-secondary rounded-lg text-secondary hover:bg-light-gray transition-all">
+                            Anterior
+                        </a>
+                    {% else %}
+                        <div></div> <!-- Placeholder to keep justify-between working -->
+                    {% endif %}
+
+                    <button type="submit" class="py-2 px-4 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all">
+                        {% if current_step_index|add:1 == total_steps %}
+                            Finalizar
+                        {% else %}
+                            Siguiente
+                        {% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

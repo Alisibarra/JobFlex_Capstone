@@ -1,0 +1,59 @@
+{% comment %}<div class="max-w-3xl mx-auto mt-10 bg-white shadow-md rounded-2xl p-6">
+	<h2 class="text-2xl font-semibold text-gray-800 mb-4">{{ job.name }}</h2>
+
+	<p class="text-gray-600 mb-1"><strong>Empresa:</strong> {{ job.company.name }}</p>
+	<p class="text-gray-600 mb-1"><strong>Modalidad:</strong> {{ job.get_mode_display_with_place }}</p>
+	<p class="text-gray-600 mb-1"><strong>Nivel:</strong> {{ job.get_level_display }}</p>
+	<p class="text-gray-600 mb-1"><strong>Salario:</strong> {{ job.salary }}</p>
+	<p class="text-gray-600 mb-1"><strong>Horario:</strong> {{ job.Time_start }} - {{ job.Time_end }}</p>
+
+	<h3 class="text-lg font-medium text-gray-700 mt-6 mb-2">Habilidades</h3>
+	<ul class="list-disc list-inside text-gray-600">
+		{% for ab in job.abilities.all %}
+			<li>{{ ab.name }}</li>
+		{% empty %}
+			<li>No se especificaron abilidades.</li>
+		{% endfor %}
+	</ul>
+	<h3 class="text-lg font-medium text-gray-700 mt-6 mb-2">Requisitos</h3>
+	<ul class="list-disc list-inside text-gray-600">
+		{% for req in job.requirements %}
+			<li>{{ req }}</li>
+		{% empty %}
+			<li>No se especificaron requisitos.</li>
+		{% endfor %}
+	</ul>
+</div>
+{% endcomment %}
+<div class="flex justify-between items-start">
+	<div>
+		<h1 class="text-3xl font-bold text-dark">{{ job.name }}</h1>
+		<p class="text-lg text-secondary"><a href="{% url 'company_profile' %}" class="hover:underline hover:text-primary">{{ job.company }}</a> • {{ job.get_mode_display_with_place }}</p>
+	</div>
+	<button class="bg-primary text-white font-bold py-3 px-6 rounded-lg hover:bg-opacity-90 flex-shrink-0">Postular</button>
+</div>
+<div class="flex items-center flex-wrap gap-x-6 gap-y-2 border-y border-gray-200 my-6 py-4">
+	<div class="text-left"><p class="font-bold text-dark">{{ job.salary }}</p><p class="text-sm text-secondary">Salario</p></div>
+	<div class="text-left"><p class="font-bold text-dark">{{ job.Time_start }} - {{ job.Time_end }}</p><p class="text-sm text-secondary">Jornada</p></div>
+	<div class="text-left"><p class="font-bold text-dark">{{ job.get_level_display }}</p><p class="text-sm text-secondary">Nivel</p></div>
+</div>
+<h2 class="text-xl font-bold text-dark mb-3">Habilidades Clave</h2>
+<div class="flex flex-wrap gap-2 mb-6">
+	<ul class="list-disc list-inside text-gray-600">
+		{% for ab in job.abilities.all %}
+			<span class="bg-{{ab.color}}-100 text-{{ab.color}}-800 text-xs font-medium px-2.5 py-0.5 rounded-full">{{ ab.name }}</span>
+		{% empty %}
+			<li>No se especificaron abilidades.</li>
+		{% endfor %}
+	</ul>
+</div>
+<h2 class="text-xl font-bold text-dark mb-2">Descripción del Puesto</h2>
+<p class="text-secondary mb-4">{{ job.description }}</p>
+<h2 class="text-xl font-bold text-dark mb-2">Requisitos</h2>
+<ul class="list-disc list-inside text-secondary space-y-1 mb-4">
+	{% for req in job.requirements %}
+		<li>{{ req }}</li>
+	{% empty %}
+		<li>No se especificaron requisitos.</li>
+	{% endfor %}
+</ul>
