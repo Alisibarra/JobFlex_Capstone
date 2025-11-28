@@ -1,8 +1,0 @@
-<?xml version = '1.0' encoding = 'UTF-8'?>
-<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="bbdd_jobflex" id="D168B03F-4C42-7AA2-EBA5-3EED5CF21068" version="3.5">
-<createdBy>Italo</createdBy>
-<createdTime>2025-11-19 23:35:57 UTC</createdTime>
-<ownerDesignName>bbdd_jobflex</ownerDesignName>
-<capitalNames>false</capitalNames>
-<designId>D168B03F-4C42-7AA2-EBA5-3EED5CF21068</designId>
-</OSDM_Design>
